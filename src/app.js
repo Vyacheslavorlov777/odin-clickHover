@@ -7,26 +7,26 @@ export default () => {
     };
 
     const createArea = (size) => {
-            for ( let i = 0; i < size; i++) {
+            for ( let row = 0; row < size; row++) {
                 const rowContainer = document.createElement('div');
                 rowContainer.classList.add('container-row');
                 elements.container.appendChild(rowContainer);
-                for ( let i = 0; i < size; i++) {
+                for ( let column = 0; column < size; column++) {
                     const divInRow = document.createElement('div');
-                    divInRow.classList.add('div-element-row')
+                    divInRow.classList.add('element-row')
                     rowContainer.appendChild(divInRow);
                 };
             };
     };
 
     const targetHover = (e) => {
-        if (e.target.classList.contains('div-element-row')) {
+        if (e.target.classList.contains('element-row')) {
             e.target.style.backgroundColor = 'red';
         }
     };
     
     const targetClick = (e) => {
-        if (e.target.classList.contains('div-element-row')) {
+        if (e.target.classList.contains('element-row')) {
             e.target.style.backgroundColor = 'white';
         }
     };
@@ -36,17 +36,13 @@ export default () => {
     const typeInteraction = () => {
         elements.container.removeEventListener('mouseover', targetHover);
         elements.container.removeEventListener('click', targetClick);
-    
-        if (clickState) {
-    
-            elements.container.addEventListener('mouseover', targetHover);
-            elements.variableClickBtn.textContent = 'Hover';
-    
-        }
-        else {
-            elements.container.addEventListener('click', targetClick);
-            elements.variableClickBtn.textContent = 'Click';
-        }
+
+        const mode = clickState ? 
+            {event: 'mouseover', handler: targetHover, text: 'Hover'} : 
+            {event: 'click', handler: targetClick, text: 'Click'};
+
+        elements.container.addEventListener(mode.event, mode.handler);
+        elements.variableClickBtn.textContent = mode.text;
     };
     
     elements.variableClickBtn.addEventListener('click', function () {
@@ -56,17 +52,19 @@ export default () => {
 
     elements.sizeBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        let prom = prompt('Напишите размер окна');
+        let newSize = prompt('Напишите размер окна');
 
-        if (prom > 100) {
-            alert('Max size: 100!');
+        const size = parseInt(newSize);
+
+        if (isNaN(size) || size <= 0) {
+            alert('Пожалуйста, введите положительное число');
             return;
-        } else if (prom == 0) {
-            alert('Min size: 1!');
+        } else if (size > 100) {
+            alert('Максимальный размер 100!');
             return;
         }
         elements.container.innerHTML = ``
-        createArea(prom);
+        createArea(size);
     });
 
 
@@ -82,9 +80,10 @@ export default () => {
         }, 500)
     });
 
-
-    // Default size:
-    createArea(16);
-    // Default clicker
-    typeInteraction();
+    const initialization = () => {
+        createArea(16);
+        typeInteraction();
+    };
+    
+    initialization();
 }
